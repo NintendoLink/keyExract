@@ -37,12 +37,11 @@ def tupleQucikSort(array):
 
         less=tupleQucikSort(less)
         more=tupleQucikSort(more)
-
         return less+pivotList+more
 
 # 读取原始的语料库文件
 for fname in os.listdir(corpus_dir):
-    for line in open(os.path.join(corpus_dir, fname)):
+    for line in open(os.path.join(corpus_dir, fname),"r",encoding="utf-8"):
         csv_content.append(line)
         sentence=jieba.cut(line,cut_all=True)
         # print([word for word in sentence])
