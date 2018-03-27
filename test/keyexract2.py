@@ -41,11 +41,12 @@ def tupleQucikSort(array):
 
 # 读取原始的语料库文件
 for fname in os.listdir(corpus_dir):
-    for line in open(os.path.join(corpus_dir, fname),"r",encoding="utf-8"):
+    with open(os.path.join(corpus_dir, fname),'r',encoding='utf-8') as f:
+        line=f.read()
         csv_content.append(line)
         sentence=jieba.cut(line,cut_all=True)
-        # print([word for word in sentence])
-        documents.append([word for word in sentence if word != ""])
+        # print([word for word in sentence if word != ''])
+        documents.append([word for word in sentence if word != ''])
 
 
 # 构造词典
@@ -54,12 +55,13 @@ Dict=corpora.Dictionary(documents)
 corpus=[Dict.doc2bow(doc) for doc in documents]
 # 初始化TF—IDF模型
 tf_idf=models.TfidfModel(corpus)
-
 # TF_IDF中的值
 for doc in tf_idf[corpus]:
     # print(tupleQucikSort(doc))
+    # print(doc)
     print('*******************************')
-    for i in range(5):
+    for i in range(9):
+    # Dict[词的索引编号]
         word=Dict[tupleQucikSort(doc)[i][0]]
         tf_idf_value=tupleQucikSort(doc)[i][1]
 
