@@ -36,12 +36,25 @@ Dict=corpora.Dictionary(documents)
 # 构造语料库
 corpus=[Dict.doc2bow(doc) for doc in documents]
 # print(corpus)##[[(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1)]]
-corpuss=[[]]
-for doc in corpus:
-    wordId=[]
-    for wordList in doc:
-        wordId.append(wordList[0])
-    corpuss.append(wordId)
+# corpuss=[[]]
+# for doc in corpus:
+#     wordId=[]
+#     for wordList in doc:
+#         wordId.append(wordList[0])
+#     corpuss.append(wordId)
+#
+# for i in corpuss:
+#     print(i)
+# for i in Dict.keys():
+#     print(i)
 
-for i in corpuss:
-    print(i)
+# for key,val in Dict.token2id:
+#     print(str(key)+"====>"+str(val))
+# print(type(Dict.token2id))
+# print(Dict.token2id)
+# print(Dict.token2id['上映'])
+# dict2={k:z for z,k in Dict.token2id.items()}
+# print(dict2)
+
+for item in Dict.items():
+    print(item)
