@@ -8,6 +8,8 @@ import jieba.posseg as pseg
 import pickle
 from gensim import corpora
 
+def getDocument(corpus_dir,pos_flag=False,pos_set=[]):
+    pass
 # 单级目录的文档读取
 def getDocuments(corpus_dir,pos_flag=False,pos_set=[]):
     documents = []
@@ -47,7 +49,7 @@ def getNetEasy(corpus_dir,pos_flag=False,pos_set=[],random_flag=False,rate=0.1):
     # print(len(documents))
     # for doc in documents:
     #     print(doc)
-def cumputeIDF(Dict,corpus):
+def cumputeIDF(corpus):
     corpus_count=1
     IDF_DICT={}
     corpuss = []
@@ -83,73 +85,83 @@ def cumputeIDF(Dict,corpus):
     #                     include_num+=1
     #             IDF_DICT[word2id]=corpuss_len/include_num
 
-    with open('IDF_DICT2','wb') as f:
-        pickle.dump(IDF_DICT,f)
-        f.close()
     return IDF_DICT
 
 # 计算TF值
-def computeTF(Dict,document):
-    DictItemReversed={tokenid:word for word,tokenid in Dict.items()}
+def computeTF(document):
     wordCount={}
     for word in document:
-        if word in wordCount.keys():
-            wordCount[word]+=1
+        if word[0] in wordCount.keys():
+            wordCount[word[0]]+=1
         else:
-            wordCount[word]=1
-    for word in wordCount.keys():
-        if word not in DictItemReversed.keys():
-            wordCount.pop(word)
-        else:
-            pass
-    print(wordCount)
+            wordCount[word[0]]=1
     return wordCount
 
-def computeTFIDF(Dict,IDF_DICT,Document):
-    DictItemReversed={tokenid:word for word,tokenid in Dict.item()}
-    for word in Document:
-        if word in DictItemReversed.keys():
-            # 计算TF*IDF
-            DictItemReversed.get(word)
-            pass
-        pass
+def computeTFIDF(IDF_DICT,TF_wordCount):
+    # 1.把document进行token2id
+    # 2.遍历TF_wordcount
+    #     2.1 查找IDF_DICT
+    #     2.2 存储TF*IDF
+    TFMultiIDF={}
 
+    for token2id in  TF_wordCount.keys():
+        TFMultiIDF[token2id]=TF_wordCount[token2id]*IDF_DICT[token2id]
+    return TFMultiIDF
 
-if __name__ == '__main__':
-
+def save(dictDir,idfDir,corpusDir):
     # 要保存的内容：
     #     1、Dict 字典
     #     2、documents
     #     3、IDF_DICT
 
-    pos_set = ['ns', 'n','v','a']
+    pos_set = ['ns', 'n', 'v', 'a']
 
     # corpus_dir = '../corpora'
     # documents=getDocuments(corpus_dir,pos_flag=True,pos_set=pos_set)
 
     # netEasyCorpusDir='E:/neteasy'
     netEasyCorpusDir = 'E:/corpus/dataset_602151/new4000'
-    documents=getNetEasy(netEasyCorpusDir,pos_flag=True,pos_set=pos_set)
+    documents = getNetEasy(netEasyCorpusDir, pos_flag=True, pos_set=pos_set)
     # documents=getNetEasy(netEasyCorpusDir)
 
     # 构造词典
     Dict = corpora.Dictionary(documents)
-
-    # for word in Dict.token2id:
-    #     print(word)
-
-
-    with open('DICT2','wb') as f:
+    with open(dictDir, 'wb') as f:
         Dict.save(f)
         f.close()
     # Dict = corpora.Dictionary.load(fname='DICT2')
     # print(Dict. token2id){'亿': 9, '亿元': 10, '今年': 11, '其中': 12, '再创':}
     # 构造语料库
     corpus = [Dict.doc2bow(doc) for doc in documents]
-    # with open('corpus','wb') as f:
-    #     pickle.dump(corpus,f)
-    #     f.close()
+    # 保存语料库
+    with open('corpus', 'wb') as f:
+        pickle.dump(corpus, f)
+        f.close()
     # print(corpus)##[[(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1)]]
-    cumputeIDF(Dict=Dict,corpus=corpus)
-    # document=['高度','财政']
-    # computeTF(Dict,document)
+    idfDict=cumputeIDF(corpus=corpus)
+
+    # 保存IDF词典
+    with open('IDF_DICT2','wb') as f:
+        pickle.dump(idfDict,f)
+        f.close()
+
+def load(dictDir,idfDir,corpusDir):
+    Dict = corpora.Dictionary.load(dictDir)
+    IDF = {}
+    with open(idfDir, 'rb') as f:
+        IDF = pickle.load(f)
+
+    documentText = ['高度', '财政']
+    documents = Dict.doc2bow(documentText)
+    wordCount = computeTF(documents)
+    return computeTFIDF(IDF, wordCount)
+
+if __name__ == '__main__':
+    dictDir="DICT2"
+    idfDir="IDF_DICT2"
+    corpusDir="corpus"
+
+    tf_idf=load(dictDir,idfDir,corpusDir)
+
+    for word2id in tf_idf:
+        print(tf_idf[word2id])

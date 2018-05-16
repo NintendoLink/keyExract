@@ -2,10 +2,8 @@
 # encoding: utf-8
 import pickle
 from gensim import corpora
-import jieba
-import jieba.posseg as pseg
+from test import keyextract
 DICT_DIR='IDF_DICT2'
-IDF_DIR='DICT2'
 CORPUS_DIR='corpus'
 IDF={}
 DICT=corpora.Dictionary.load('DICT2')
@@ -23,3 +21,4 @@ with open(DICT_DIR,'rb') as f:
 for key in IDF:
     # print(key)
     print(IDF[key])
+
